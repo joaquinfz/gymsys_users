@@ -1,6 +1,6 @@
 package com.project.gymsystem.UserService.Controller;
 
-import com.project.gymsystem.UserService.Entity.User;
+import com.project.gymsystem.UserService.Dto.UserDto;
 import com.project.gymsystem.UserService.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +19,9 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/me")
-    public String getUserProfile() {
-        return "User profile details";
+    @GetMapping("/{id}")
+    public UserDto getUserProfile(@PathVariable Long id) {
+        return userService.getUser(id);
     }
 
     @PutMapping("/update")
@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<User> createUserProfile(@RequestBody UserDto user){
+    public ResponseEntity<String> createUserProfile(@RequestBody UserDto user){
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
             String loggedInUser = ((UserDetails) principal).getUsername();
@@ -38,7 +38,7 @@ public class UserController {
         }
 
         // Save user in the database
-        User newUser = userService.createUser(user);
-        return ResponseEntity.ok(newUser);
+        String newId = userService.createUser(user);
+        return ResponseEntity.ok(newId);
     }
 }

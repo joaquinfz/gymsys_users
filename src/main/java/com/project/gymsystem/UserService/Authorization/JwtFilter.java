@@ -11,6 +11,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,7 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtFilter extends OncePerRequestFilter {
 
-    private static final String SECRET = "your-256-bit-secret-your-256-bit-secret"; // Must be 32 bytes
+    private static final String SECRET = generateSecret(); // Must be 32 bytes
     private final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET));
 
     @Override
@@ -54,5 +56,14 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static String generateSecret(){
+        byte[] key = new byte[32]; // 256 bits = 32 bytes
+        new SecureRandom().nextBytes(key);
+        String base64Key = Base64.getEncoder().encodeToString(key);
+        System.out.println("Generated JWT Secret Key: " + base64Key);
+
+        return base64Key;
     }
 }
